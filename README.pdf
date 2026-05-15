@@ -1,0 +1,150 @@
+Software Requirements Specification (SRS)
+DRUKSAFE — AI-Powered Flood Prediction & Early Warning System
+Introduction
+Purpose This document specifies the complete functional and non-functional requirements for
+DrukSafe, an AI-powered flood prediction and early warning system developed specifically for
+the Kingdom of Bhutan.
+It serves as the main technical blueprint for the development team during the TechBiz
+Bootcamp and as a reference document for future deployment with the Government of Bhutan
+and NCHM.
+
+Project Overview
+DrukSafe is a web-based dashboard that:
+• Monitors real-time rainfall data across Bhutan’s highest flood-risk dzongkhags
+• Calculates flood risk scores using AI-assisted logic
+• Automatically sends SMS alerts to farmers, local leaders, and disaster management
+officials when risk thresholds are crossed
+Unlike current reactive systems, DrukSafe is predictive where it aims to warn communities
+several hours before floodwaters arrive.
+
+Scope In Scope (v1.0):
+• Real-time rainfall monitoring via Open-Meteo API
+• River level estimation from rainfall accumulation
+• District-level flood risk scoring (0–100)
+• Interactive map dashboard with colour-coded risk zones
+• Automated SMS alerts (English + Dzongkha)
+• Simulation/demo mode for presentations and training
+Intended Audience
+• Project supervisors and evaluators (TechBiz Bootcamp)
+• Development team
+• Government stakeholders (NCHM, DDM)
+• Future maintainers and funders
+Overall Description
+Product Perspective DrukSafe is a standalone web application designed to fill a critical gap in
+Bhutan’s current Early Warning Systems by shifting from “detect-and-warn” to “predict-andprotect”.
+
+User Classes
+• General Users / Officials: View dashboard and risk status
+• Administrators: Manage alert recipients, thresholds, and simulation mode
+• End Recipients: Farmers and local leaders who receive SMS alerts
+Operating Environment
+• Modern web browser (Chrome, Firefox, Edge)
+• Desktop and large presentation screens
+• Internet connection required for live data (simulation mode works offline)
+Functional Requirements
+
+3.1 Dashboard & Map
+• The system shall display a Bhutan district map using Leaflet.js with GeoJSON overlay.
+• The map shall colour-code the four target districts in real time based on current risk
+score.
+• Clicking a district shall open a detail panel showing rainfall, river level, risk score, and
+timestamp.
+• Dashboard shall show a global status indicator (ALL CLEAR / ADVISORY / ALERT ACTIVE).
+• Last Updated timestamp shall refresh every 15 minutes.
+3.2 Data Collection & Processing
+• The system shall fetch rainfall forecast data from Open-Meteo API for the 4 target
+districts every 15 minutes.
+• The system shall estimate river level rise (%) based on upstream rainfall accumulation.
+• Data shall be stored locally in SQLite with timestamps.
+• If API is unavailable, the system shall show last known data with a “Data Stale” warning.
+
+3.3 AI Risk Scoring Engine
+• The risk engine shall calculate a flood risk score (0–100) for each district every 15
+minutes.
+• Score calculation shall consider rainfall forecast, estimated river rise, and district
+sensitivity.
+• Primary engine: Rules-based logic (e.g., rainfall >80mm AND river rise >20% = High Risk).
+• Optional upgrade: Machine learning model (scikit-learn) trained on historical data.
+
+3.4 Alert System
+• The system shall automatically send SMS alerts when risk score > 70 (High).
+• Alerts shall be sent in both English and Dzongkha.
+• Alert message shall include district name, risk level, key readings, and recommended
+action.
+• Twilio API shall be used for real SMS (with on-screen simulation fallback).
+• The system shall avoid sending duplicate alerts within 1 hour.
+
+3.5 Simulation Mode
+• The dashboard shall have a “Simulate Monsoon Event” feature.
+• In simulation mode, rainfall and river levels shall increase gradually.
+• The map shall animate colour changes and trigger sample SMS alerts.
+• Manual sliders for rainfall and river level shall be available.
+• Simulation mode shall be clearly labelled to avoid confusion with live data.
+
+Non-Functional Requirements
+Performance
+• Dashboard shall load within 5 seconds.
+• Risk score calculation shall complete within 3 seconds.
+• SMS dispatch shall occur within 10 seconds of threshold breach.
+
+Reliability
+• Target 95% uptime during monsoon season.
+• System shall fallback to last valid data if API fails.
+• Alert sending shall retry up to 3 times.
+Usability
+• The system shall be usable by non-technical government officers after a short briefing.
+• All text shall be available in English and Dzongkha.
+• Colour coding shall follow WCAG AA accessibility standards.
+
+Security
+• Phone numbers shall be stored encrypted.
+• Twilio keys shall not be exposed in frontend code.
+• Admin panel shall require password authentication.
+
+Scalability
+• Architecture shall support easy expansion to all 20 dzongkhags.
+• Shall allow future integration with NCHM river gauge sensors and satellite data.
+External Interfaces
+
+APIs and Services
+• Open-Meteo API: Free rainfall forecast (no key required)
+• Twilio SMS API: For sending real alerts
+• Leaflet.js + Bhutan GeoJSON: Interactive map
+• Chart.js: Rainfall and river level charts
+
+Hardware / Deployment
+• Prototype: Vercel / GitHub Pages or small cloud instance
+• Production: Small VPS during monsoon season
+Constraints & Assumptions
+
+Constraints
+• Limited to 72-hour hackathon development time.
+• No real-time river gauge data from NCHM during prototype.
+• Twilio free trial has SMS limits.
+• Open-Meteo provides forecast, not real river levels.
+
+Assumptions
+• Target areas have reliable mobile coverage for SMS.
+• Recipients will act upon receiving alerts.
+• Open-Meteo API remains available.
+• Government will provide historical flood data for future ML training.
+Business Model & Competitive Advantage
+
+Competitive Advantage
+DrukSafe is the only system that offers predictive capability + Dzongkha alerts + Bhutanspecific focus.
+Revenue Streams
+1. Government Licensing – Annual SaaS contract with DDM/NCHM
+2. Insurance Partnership – Sell risk data to insurance companies
+3. International Grants – UNDP, World Bank, ADB climate funds
+
+Growth Roadmap
+• Prototype: Hackathon (4 districts + simulation)
+• Pilot: Year 1 (Government pilot + real integration)
+• Scale: Year 2 (All 20 dzongkhags)
+• Regional: Year 3 (Nepal, Bangladesh)
+
+Team Roles & Responsibilities
+• Frontend Developer: Map, charts, UI, simulation
+• Backend / Data Developer: API integration, risk engine, SMS
+• AI / Data Analyst: Risk scoring logic and ML model
+• Business / Pitch Lead: Research, impact stories, pitch delivery
