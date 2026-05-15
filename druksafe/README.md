@@ -1,36 +1,27 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# DrukSafe
 
-## Getting Started
+AI-powered flood prediction and early warning dashboard for Bhutan.
 
-First, run the development server:
+## Prototype Scope
+
+- Monitors the four v1 target dzongkhags: Punakha, Wangdue Phodrang, Sarpang, and Samtse.
+- Fetches rainfall forecast data through a Next.js API route backed by Open-Meteo.
+- Estimates river level rise and calculates a district risk score from 0-100.
+- Shows a colour-coded dashboard map, district detail panel, rainfall trend chart, and global status.
+- Includes a clearly labelled simulation mode with rainfall and river controls.
+- Generates bilingual English and Dzongkha SMS alert previews when risk crosses 70/100.
+- Keeps Twilio keys server-side in `src/app/api/alerts/route.js`; without credentials it uses an on-screen simulation fallback.
+
+## Commands
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm run lint
+npm run build
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open `http://localhost:3000` after starting the development server.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+## Production Notes
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The current app is a hackathon-ready prototype. For production, add encrypted recipient storage, a real SQLite or managed database adapter, authenticated admin routes, real Bhutan district GeoJSON with Leaflet, and verified Twilio recipient lists from DDM/NCHM.
