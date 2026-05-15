@@ -60,7 +60,7 @@ export default function DrukSafeDashboard() {
       {
         label: t.districtsWatched,
         value: String(DISTRICTS.length),
-        detail: "Punakha, Wangdue, Sarpang, Samtse",
+        detail: "Punakha, Sarpang, Samtse, Zhemgang",
         tone: "neutral",
       },
       {

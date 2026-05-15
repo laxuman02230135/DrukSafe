@@ -1,81 +1,72 @@
+import { getDistrictById, getDistrictByName } from "@/data/districts";
+import { HIGH_RISK_THRESHOLD } from "@/lib/riskEngine";
+import { hasTwilioConfig, sendBilingualFloodAlert } from "@/lib/twilio";
+
 export const dynamic = "force-dynamic";
-
-function hasTwilioConfig() {
-  return Boolean(
-    process.env.TWILIO_ACCOUNT_SID &&
-      process.env.TWILIO_AUTH_TOKEN &&
-      process.env.TWILIO_FROM_NUMBER
-  );
-}
-
-async function sendTwilioSms({ recipient, message }) {
-  const accountSid = process.env.TWILIO_ACCOUNT_SID;
-  const authToken = process.env.TWILIO_AUTH_TOKEN;
-  const fromNumber = process.env.TWILIO_FROM_NUMBER;
-  const body = new URLSearchParams({
-    To: recipient,
-    From: fromNumber,
-    Body: message,
-  });
-
-  const response = await fetch(
-    `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`,
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Basic ${Buffer.from(`${accountSid}:${authToken}`).toString("base64")}`,
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      body,
-    }
-  );
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(errorText || `Twilio ${response.status}`);
-  }
-
-  return response.json();
-}
-
-async function sendTwilioSmsWithRetry(payload) {
-  let lastError;
-
-  for (let attempt = 1; attempt <= 3; attempt += 1) {
-    try {
-      return await sendTwilioSms(payload);
-    } catch (error) {
-      lastError = error;
-    }
-  }
-
-  throw lastError;
-}
+export const runtime = "nodejs";
 
 export async function POST(request) {
-  const payload = await request.json();
-  const recipients = Array.isArray(payload.recipients) ? payload.recipients : [];
-  const message = [payload.messages?.english, payload.messages?.dzongkha]
-    .filter(Boolean)
-    .join("\n\n");
-  const sentAt = new Date().toISOString();
+  let payload;
 
-  if (!hasTwilioConfig() || recipients.length === 0) {
+  try {
+    payload = await request.json();
+  } catch {
+    return Response.json({ error: "Invalid JSON payload" }, { status: 400 });
+  }
+
+  const district =
+    getDistrictById(payload.districtId) ?? getDistrictByName(payload.district);
+  const riskScore = Number(payload.riskScore ?? payload.score);
+  const rainfall = Number(payload.rainfall);
+  const riverRise = Number(payload.riverRise);
+
+  if (!district) {
+    return Response.json(
+      { error: "A supported districtId or district name is required" },
+      { status: 400 }
+    );
+  }
+
+  if (!Number.isFinite(riskScore)) {
+    return Response.json({ error: "riskScore is required" }, { status: 400 });
+  }
+
+  if (!Number.isFinite(rainfall) || !Number.isFinite(riverRise)) {
+    return Response.json(
+      { error: "rainfall and riverRise are required" },
+      { status: 400 }
+    );
+  }
+
+  if (riskScore <= HIGH_RISK_THRESHOLD) {
     return Response.json({
-      mode: "simulation",
-      sentAt,
-      deliveries: recipients.length,
-      message: "Twilio credentials or recipients are not configured. Alert shown on screen.",
+      mode: "skipped",
+      threshold: HIGH_RISK_THRESHOLD,
+      message: `Risk score must be greater than ${HIGH_RISK_THRESHOLD}`,
     });
   }
 
-  const deliveries = await Promise.all(
-    recipients.map((recipient) => sendTwilioSmsWithRetry({ recipient, message }))
-  );
+  const result = await sendBilingualFloodAlert({
+    district,
+    rainfall: Math.round(rainfall),
+    recipients: payload.recipients,
+    riskScore: Math.round(riskScore),
+    riverRise: Math.round(riverRise),
+  });
 
   return Response.json({
-    mode: "twilio",
-    sentAt,
-    deliveries: deliveries.length,
+    district: district.name,
+    threshold: HIGH_RISK_THRESHOLD,
+    twilioConfigured: hasTwilioConfig(),
+    ...result,
+  });
+}
+
+export async function GET() {
+  return Response.json({
+    threshold: HIGH_RISK_THRESHOLD,
+    twilioConfigured: hasTwilioConfig(),
+    recipientMode: "prototype-single-number",
+    target: process.env.ALERT_PHONE_NUMBER ?? "77459910",
   });
 }

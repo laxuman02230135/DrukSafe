@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { ALERT_RECIPIENTS } from "@/data/districts";
 import {
   ALERT_COOLDOWN_MS,
   COPY,
@@ -18,7 +19,7 @@ export function useFloodAlerts({ dataLoading, districts, mode }) {
     }
 
     const highRiskDistricts = districts.filter(
-      (district) => district.score >= HIGH_RISK_THRESHOLD
+      (district) => district.riskScore > HIGH_RISK_THRESHOLD
     );
     const now = Date.now();
 
@@ -33,10 +34,11 @@ export function useFloodAlerts({ dataLoading, districts, mode }) {
       const alert = {
         id: `${district.id}-${now}`,
         district: district.name,
-        score: district.score,
+        score: district.riskScore,
         mode,
         sentAt: new Date(now).toISOString(),
         messages,
+        deliveries: [],
       };
 
       setAlertLog((current) => [alert, ...current].slice(0, 6));
@@ -46,11 +48,28 @@ export function useFloodAlerts({ dataLoading, districts, mode }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           district: district.name,
-          score: district.score,
-          messages,
-          recipients: [],
+          districtId: district.id,
+          rainfall: district.rainfall,
+          recipients: ALERT_RECIPIENTS.map((recipient) => recipient.phone),
+          riskScore: district.riskScore,
+          riverRise: district.riverRise,
         }),
-      }).catch(() => {});
+      })
+        .then((response) => response.json())
+        .then((result) => {
+          setAlertLog((current) =>
+            current.map((item) =>
+              item.id === alert.id
+                ? {
+                    ...item,
+                    deliveries: result.deliveries ?? [],
+                    dispatchMode: result.mode,
+                  }
+                : item
+            )
+          );
+        })
+        .catch(() => {});
     });
   }, [dataLoading, districts, mode]);
 

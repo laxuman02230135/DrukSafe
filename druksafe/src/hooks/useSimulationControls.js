@@ -29,7 +29,7 @@ export function useSimulationControls() {
 
   const changeMode = useCallback((nextMode) => {
     setMode(nextMode);
-    setSimulationRunning(nextMode === "simulation");
+    setSimulationRunning(false);
   }, []);
 
   const startSimulation = useCallback(() => {
