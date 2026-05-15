@@ -31,7 +31,7 @@ export function useWeatherReadings() {
     source: "Baseline",
     stale: true,
     loading: true,
-    message: "Loading Open-Meteo forecast",
+    message: "Loading Open-Meteo forecast and flood data",
   });
   const [lastUpdated, setLastUpdated] = useState(null);
 
@@ -39,7 +39,7 @@ export function useWeatherReadings() {
     setDataStatus((current) => ({
       ...current,
       loading: true,
-      message: "Refreshing Open-Meteo forecast",
+      message: "Refreshing Open-Meteo forecast and flood data",
     }));
 
     try {
@@ -55,7 +55,7 @@ export function useWeatherReadings() {
         source: payload.source,
         stale: Boolean(payload.stale),
         loading: false,
-        message: "Live forecast active",
+        message: payload.message ?? "Live forecast active",
       });
       saveCachedReadings(payload);
     } catch {

@@ -1,5 +1,9 @@
 import ReadingTile from "@/components/ui/ReadingTile";
 
+function formatOptionalMetric(value, suffix) {
+  return value === null || value === undefined ? "--" : `${value}${suffix}`;
+}
+
 export default function DistrictDetail({ district, t }) {
   return (
     <aside className="rounded-lg border border-[#d8e2dc] bg-white p-5 shadow-sm">
@@ -38,6 +42,14 @@ export default function DistrictDetail({ district, t }) {
       <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
         <ReadingTile label={t.rainfall} value={`${district.rainfall} mm`} />
         <ReadingTile label={t.riverRise} value={`${district.riverRise}%`} />
+        <ReadingTile
+          label="Rain chance"
+          value={formatOptionalMetric(district.precipitationProbability, "%")}
+        />
+        <ReadingTile
+          label="River flow"
+          value={formatOptionalMetric(district.riverDischarge, " m3/s")}
+        />
         <ReadingTile label="Basin" value={district.basin} />
         <ReadingTile label="Lead" value={district.lead} />
       </div>

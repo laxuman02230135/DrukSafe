@@ -21,8 +21,8 @@ export default function DashboardSummary({
               {t.operations}
             </h1>
             <p className="mt-3 max-w-2xl break-words text-base leading-7 text-[#5d6f69]">
-              Predictive rainfall, estimated river rise, and SMS readiness for
-              Bhutan&apos;s highest-risk v1 dzongkhags.
+              Live rainfall forecast, GloFAS river discharge, and SMS readiness
+              for Bhutan&apos;s highest-risk v1 dzongkhags.
             </p>
           </div>
           <div className="grid w-full gap-2 rounded-md border border-[#d8e2dc] bg-[#f7faf8] p-3 text-sm md:min-w-48 md:w-auto">

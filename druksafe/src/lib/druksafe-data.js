@@ -209,6 +209,10 @@ export function buildFallbackReadings() {
         rainfall: district.rainfall,
         riverRise: district.riverRise,
         history: district.history,
+        currentRainfall: null,
+        peakDischarge: null,
+        precipitationProbability: null,
+        riverDischarge: null,
         updatedAt: null,
       },
     ])
@@ -235,6 +239,11 @@ export function enrichDistricts(readings) {
       score,
       level: getRiskLevel(score),
       history: current.history?.length ? current.history : district.history,
+      currentRainfall: current.currentRainfall ?? null,
+      floodSource: current.floodSource ?? "Estimated",
+      peakDischarge: current.peakDischarge ?? null,
+      precipitationProbability: current.precipitationProbability ?? null,
+      riverDischarge: current.riverDischarge ?? null,
       updatedAt: current.updatedAt ?? null,
     };
   });
@@ -287,6 +296,11 @@ export function createSimulationReadings(rainfallInput, riverInput) {
           rainfall,
           riverRise,
           history,
+          currentRainfall: null,
+          floodSource: "Simulation",
+          peakDischarge: null,
+          precipitationProbability: null,
+          riverDischarge: null,
           updatedAt: new Date().toISOString(),
         },
       ];
