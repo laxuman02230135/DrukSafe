@@ -44,60 +44,49 @@ input:focus-visible {
 }
 
 .map-canvas {
+  isolation: isolate;
   position: relative;
   min-height: 420px;
   overflow: hidden;
   border: 1px solid #d8e2dc;
   border-radius: 8px;
+  background: #dfe9e4;
+}
+
+.google-map-frame {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  filter: saturate(0.88) contrast(0.98);
+}
+
+.map-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
   background:
-    linear-gradient(135deg, rgba(235, 244, 240, 0.95), rgba(245, 249, 246, 0.82)),
-    repeating-linear-gradient(
-      0deg,
-      rgba(15, 92, 92, 0.06) 0,
-      rgba(15, 92, 92, 0.06) 1px,
-      transparent 1px,
-      transparent 34px
-    ),
-    repeating-linear-gradient(
-      90deg,
-      rgba(15, 92, 92, 0.05) 0,
-      rgba(15, 92, 92, 0.05) 1px,
-      transparent 1px,
-      transparent 34px
-    );
+    linear-gradient(180deg, rgba(247, 250, 248, 0.24), rgba(247, 250, 248, 0.12)),
+    radial-gradient(circle at 50% 45%, rgba(255, 255, 255, 0.08), rgba(15, 92, 92, 0.16));
+  pointer-events: none;
 }
 
 .map-grid {
   position: absolute;
   inset: 18px;
+  z-index: 2;
   border: 1px solid rgba(15, 92, 92, 0.12);
   border-radius: 6px;
   pointer-events: none;
-}
-
-.map-outline {
-  fill: rgba(226, 239, 233, 0.74);
-  stroke: rgba(15, 92, 92, 0.32);
-  stroke-width: 4;
-}
-
-.map-river {
-  fill: none;
-  stroke: #2f8fb2;
-  stroke-linecap: round;
-  stroke-width: 10;
-  opacity: 0.76;
-}
-
-.map-river-secondary {
-  stroke-width: 7;
-  opacity: 0.52;
 }
 
 .district-marker {
   --risk-color: #047857;
   --risk-soft: #d1fadf;
   position: absolute;
+  z-index: 3;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
